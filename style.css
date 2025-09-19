@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color:rgb(41, 18, 1);
+  background-color:rgb(196, 185, 178);
   color: #fff;
   text-align: center;
   margin: 0;
@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(25, 92, 96, 0.852);
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
@@ -37,8 +37,8 @@ button {
   padding: 10px 15px;
   border: none;
   background-color: #ffffff;
-  color:rgb(43, 26, 4)
-  border-radius: 10px;
+  color:rgb(21, 15, 8);
+  border-radius: 30px;
   cursor: pointer;
   font-weight: bold;
 }
