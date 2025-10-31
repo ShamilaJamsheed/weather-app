@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Dashboard 2025</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      background: linear-gradient(135deg, #0a0f1f, #1c1f3a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 25px;
+      padding: 2rem;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .year-badge {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: white;
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .date {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 1rem;
+    }
+
+    .search-box {
+      display: flex;
+      margin-bottom: 1.5rem;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .search-box input {
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      width: 70%;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .search-box button {
+      background: #0072ff;
+      border: none;
+      border-radius: 20px;
+      padding: 0.6rem 1rem;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .search-box button:hover {
+      background: #00c6ff;
+    }
+
+    .weather {
+      margin: 1rem 0;
+    }
+
+    .weather img {
+      width: 100px;
+      height: 100px;
+    }
+
+    .temp {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+
+    .desc {
+      text-transform: capitalize;
+      opacity: 0.8;
+    }
+
+    .forecast {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .day-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 1rem;
+      width: 100px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .day-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .day-card img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .day {
+      font-weight: bold;
+      margin-top: 0.3rem;
+    }
+
+    .forecast-temp {
+      font-size: 1rem;
+      margin-top: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="year-badge">2025</div>
+    <h1>Weather Dashboard</h1>
+    <p class="date" id="date"></p>
+
+    <div class="search-box">
+      <input type="text" id="city-input" placeholder="Enter city name..." />
+      <button onclick="getWeather()">Search</button>
+    </div>
+
+    <div class="weather">
+      <img id="icon" src="" alt="" />
+      <div class="temp" id="temp">--°C</div>
+      <div class="desc" id="desc">Enter a city</div>
+    </div>
+
+    <div class="forecast" id="forecast"></div>
+  </div>
+
+  <script>
+    const WEATHER_API_KEY = "c3a241e2c0963ffe34e4343402f08745";
+
+    const dateEl = document.getElementById("date");
+    const today = new Date();
+    dateEl.textContent = today.toDateString();
+
+    async function getWeather() {
+      const city = document.getElementById("city-input").value.trim();
+      if (!city) return alert("Please enter a city name!");
+
+      try {
+        // Get coordinates from city name
+        const geoRes = await fetch(
+          `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${WEATHER_API_KEY}`
+        );
+        const geoData = await geoRes.json();
+
+        if (!geoData.length) {
+          alert("City not found!");
+          return;
+        }
+
+        const { lat, lon } = geoData[0];
+
+        // Fetch weather data
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${WEATHER_API_KEY}`
+        );
+        const data = await res.json();
+
+        // Current weather
+        const current = data.list[0];
+        document.getElementById("temp").textContent =
+          Math.round(current.main.temp) + "°C";
+        document.getElementById("desc").textContent =
+          current.weather[0].description;
+        document.getElementById("icon").src = `https://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png`;
+
+        // 4-day forecast
+        const forecastContainer = document.getElementById("forecast");
+        forecastContainer.innerHTML = "";
+
+        const days = {};
+
+        data.list.forEach((item) => {
+          const date = new Date(item.dt * 1000);
+          const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+
+          if (!days[dayName]) {
+            days[dayName] = item;
+          }
+        });
+
+        Object.keys(days)
+          .slice(1, 5)
+          .forEach((day) => {
+            const item = days[day];
+            forecastContainer.innerHTML += `
+              <div class="day-card">
+                <div class="day">${day}</div>
+                <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="${item.weather[0].description}">
+                <div class="forecast-temp">${Math.round(item.main.temp)}°C</div>
+              </div>`;
+          });
+      } catch (err) {
+        console.error("Weather fetch failed", err);
+        alert("Could not get weather data. Please try again.");
+      }
+    }
+  </script>
+</body>
+</html>
